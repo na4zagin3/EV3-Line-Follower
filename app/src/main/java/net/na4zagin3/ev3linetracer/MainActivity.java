@@ -51,7 +51,7 @@ public class MainActivity extends Activity  implements CameraBridgeViewBase.CvCa
     private final static boolean USE_BLUETOOTH = true;
     private final static boolean USE_SENSORS = false;
 
-    private final static int CONTROL_INTERVAL = 1000;
+    private final static int CONTROL_INTERVAL = 100;
     final static int SPEED_CONST = 100;
 
     private double MoveX = 0;
@@ -444,10 +444,18 @@ public class MainActivity extends Activity  implements CameraBridgeViewBase.CvCa
             Point start = new Point(hX, hY);
             Point end = new Point(x + hX, y + hY);
 
-            Core.line(imageRgba, start, end, new Scalar(0, 255, 255, 0), 4);
+            Core.line(imageRgba, start, end, new Scalar(0, 0, 0, 255), 4);
 
-            MoveX = y / hY;
-            MoveY = 1;
+            double rot = y / hY; // + 1 / Math.tan(thetaC);
+            if (Double.isNaN(rot)) {
+                MoveX = MoveY = 0;
+            } else if (Math.abs(rot) <= 1) {
+                MoveX = rot;
+                MoveY = -(x / hX) + 1;
+            } else {
+                MoveX = rot > 0 ? 1 : 0;
+                MoveY = -(x / hX) + 1 / Math.abs(rot);
+            }
         }
     }
 
@@ -468,7 +476,7 @@ public class MainActivity extends Activity  implements CameraBridgeViewBase.CvCa
             Point start = new Point(x1, y1);
             Point end = new Point(x2, y2);
 
-            Core.line(inputRgba, start, end, new Scalar(0, 255, 255, 0), 4);
+            Core.line(inputRgba, start, end, new Scalar(0, 255, 255, 255), 4);
         }
     }
     private void drawLinesForHoughP(Mat inputRgba, Mat lines) {
@@ -482,7 +490,7 @@ public class MainActivity extends Activity  implements CameraBridgeViewBase.CvCa
             Point start = new Point(x1, y1);
             Point end = new Point(x2, y2);
 
-            Core.line(inputRgba, start, end, new Scalar(0, 255, 255, 0), 4);
+            Core.line(inputRgba, start, end, new Scalar(0, 255, 255, 255), 4);
         }
     }
 
